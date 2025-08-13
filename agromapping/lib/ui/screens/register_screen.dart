@@ -11,255 +11,171 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-    final _nomeController = TextEditingController();
-    final _emailController = TextEditingController();
-    final _senhaController = TextEditingController();
-    final _dataNascimentoController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final nomeController = TextEditingController();
+    final emailController = TextEditingController();
+    final senhaController = TextEditingController();
+    final dataNascimentoController = TextEditingController();
+    final telefoneController = TextEditingController();
+
+    // Ouve as mudanças no ViewModel para reconstruir a UI
     final registerViewModel = context.watch<RegisterViewModel>();
 
+    // Função para abrir o seletor de data
     Future<void> selectDate() async {
       DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
         firstDate: DateTime(1920),
         lastDate: DateTime.now(),
-        builder: (context, child) => Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(primary: primaryColor),
-          ),
-          child: child!,
-        ),
       );
       if (picked != null) {
-        _dataNascimentoController.text =
+        // Formata a data para o padrão que o backend espera (yyyy-MM-dd)
+        dataNascimentoController.text =
             "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       }
     }
 
+    // Função para submeter o formulário de registo
     void doRegister() async {
-      if (_formKey.currentState?.validate() ?? false) {
+      if (formKey.currentState?.validate() ?? false) {
         final result = await registerViewModel.register(
-          nome: _nomeController.text,
-          email: _emailController.text,
-          senha: _senhaController.text,
-          dataDeNascimento: _dataNascimentoController.text,
+          nome: nomeController.text,
+          email: emailController.text,
+          senha: senhaController.text,
+          dataDeNascimento: dataNascimentoController.text,
+          telefone: telefoneController.text,
         );
-
-        if (!context.mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Ocorreu um erro.'),
-            backgroundColor: result['success'] ? Colors.green : Colors.red,
-          ),
-        );
-
-        if (result['success']) {
-          Navigator.of(context).pop();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Ocorreu um erro.'),
+              backgroundColor: result['success'] ? Colors.green : Colors.red,
+            ),
+          );
+          if (result['success']) {
+            Navigator.of(context).pop(); // Volta para a tela de login
+          }
         }
       }
     }
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      appBar: AppBar(title: const Text('Criar Conta')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 32.0,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: primaryColor,
-                  child: Text(
-                    'A',
-                    style: TextStyle(fontSize: 30, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Criar Conta',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Junte-se à nossa comunidade',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 24),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Nome Completo',
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _nomeController,
-                        decoration: InputDecoration(
-                          hintText: 'Seu nome completo',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        validator: (v) =>
-                            v!.isEmpty ? 'Campo obrigatório' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Email',
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          hintText: 'seu@email.com',
-                          prefixIcon: const Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) => v!.isEmpty || !v.contains('@')
-                            ? 'Email inválido'
-                            : null,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Senha',
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _senhaController,
-                        obscureText: !registerViewModel.isPasswordVisible,
-                        decoration: InputDecoration(
-                          hintText: '********',
-                          prefixIcon: const Icon(Icons.lock_outline),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Campos de Nome, Email, Senha, Data de Nascimento
+                  TextFormField(
+                      controller: nomeController,
+                      decoration:
+                          const InputDecoration(labelText: 'Nome Completo'),
+                      validator: (v) =>
+                          v!.isEmpty ? 'Campo obrigatório' : null),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) => v!.isEmpty || !v.contains('@')
+                          ? 'Email inválido'
+                          : null),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                      controller: senhaController,
+                      obscureText: !registerViewModel.isPasswordVisible,
+                      decoration: InputDecoration(
+                          labelText: 'Senha',
                           suffixIcon: IconButton(
-                            icon: Icon(
-                              registerViewModel.isPasswordVisible
+                              icon: Icon(registerViewModel.isPasswordVisible
                                   ? Icons.visibility_off
-                                  : Icons.visibility,
+                                  : Icons.visibility),
+                              onPressed:
+                                  registerViewModel.togglePasswordVisibility)),
+                      validator: (v) =>
+                          v!.length < 6 ? 'Mínimo de 6 caracteres' : null),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                      controller: dataNascimentoController,
+                      decoration: const InputDecoration(
+                          labelText: 'Data de Nascimento',
+                          prefixIcon: Icon(Icons.calendar_today)),
+                      readOnly: true,
+                      onTap: selectDate,
+                      validator: (v) =>
+                          v!.isEmpty ? 'Campo obrigatório' : null),
+                  const SizedBox(height: 24),
+
+                  // Seleção de Tipo de Conta
+                  const Text('Tipo de Conta',
+                      style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16)),
+                  const SizedBox(height: 12),
+                  RoleSelectionCard(
+                      title: 'Quero comprar',
+                      subtitle: 'Comprar produtos frescos',
+                      icon: Icons.person_outline,
+                      value: 'USER',
+                      groupValue: registerViewModel.userRole,
+                      onChanged: (val) => registerViewModel.setUserRole(val)),
+                  const SizedBox(height: 12),
+                  RoleSelectionCard(
+                      title: 'Quero vender',
+                      subtitle: 'Vender meus produtos',
+                      icon: Icons.storefront_outlined,
+                      value: 'SELLER',
+                      groupValue: registerViewModel.userRole,
+                      onChanged: (val) => registerViewModel.setUserRole(val)),
+
+                  // AQUI ESTÁ A LÓGICA VISUAL CONDICIONAL
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: registerViewModel.userRole == 'SELLER'
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 16.0),
+                            child: TextFormField(
+                              controller: telefoneController,
+                              decoration: const InputDecoration(
+                                  labelText: 'Telefone de Contato',
+                                  prefixIcon: Icon(Icons.phone_outlined)),
+                              keyboardType: TextInputType.phone,
+                              validator: (v) =>
+                                  (registerViewModel.userRole == 'SELLER' &&
+                                          v!.isEmpty)
+                                      ? 'Campo obrigatório para vendedores'
+                                      : null,
                             ),
-                            onPressed:
-                                registerViewModel.togglePasswordVisibility,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        validator: (v) =>
-                            v!.length < 6 ? 'Mínimo de 6 caracteres' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Data de Nascimento',
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _dataNascimentoController,
-                        decoration: InputDecoration(
-                          hintText: 'dd/mm/aaaa',
-                          prefixIcon: const Icon(Icons.calendar_today),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        readOnly: true,
-                        onTap: selectDate,
-                        validator: (v) =>
-                            v!.isEmpty ? 'Campo obrigatório' : null,
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Tipo de Conta',
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      RoleSelectionCard(
-                        title: 'Quero comprar',
-                        subtitle: 'Comprar produtos frescos',
-                        icon: Icons.person_outline,
-                        value: 'USER',
-                        groupValue: registerViewModel.userRole,
-                        onChanged: (val) => registerViewModel.setUserRole(val),
-                      ),
-                      const SizedBox(height: 12),
-                      RoleSelectionCard(
-                        title: 'Quero vender',
-                        subtitle: 'Vender meus produtos',
-                        icon: Icons.storefront_outlined,
-                        value: 'SELLER',
-                        groupValue: registerViewModel.userRole,
-                        onChanged: (val) => registerViewModel.setUserRole(val),
-                      ),
-                    ],
+                          )
+                        : const SizedBox
+                            .shrink(), // Widget vazio se não for vendedor
                   ),
-                ),
-                const SizedBox(height: 24),
-                registerViewModel.isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: primaryColor),
-                      )
-                    : ElevatedButton(
-                        onPressed: doRegister,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Registar',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    'Já tem conta? Faça login aqui',
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  const SizedBox(height: 24),
+
+                  // Botão de Registar
+                  ElevatedButton(
+                    onPressed: registerViewModel.isLoading ? null : doRegister,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 16)),
+                    child: registerViewModel.isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Registar',
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.white)),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

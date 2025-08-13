@@ -9,7 +9,7 @@ class RegisterViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  String _userRole = 'USER';
+  String _userRole = 'USER'; // O valor inicial é 'USER'
   String get userRole => _userRole;
 
   bool _isPasswordVisible = false;
@@ -20,9 +20,10 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Este método é chamado quando o utilizador clica nos cartões de seleção
   void setUserRole(String role) {
     _userRole = role;
-    notifyListeners();
+    notifyListeners(); // Avisa a tela para se reconstruir e mostrar/esconder o campo de contato
   }
 
   Future<Map<String, dynamic>> register({
@@ -30,6 +31,7 @@ class RegisterViewModel extends ChangeNotifier {
     required String email,
     required String senha,
     required String dataDeNascimento,
+    String? telefone,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -40,6 +42,7 @@ class RegisterViewModel extends ChangeNotifier {
       senha: senha,
       dataDeNascimento: dataDeNascimento,
       userRole: _userRole,
+      telefone: telefone,
     );
 
     _isLoading = false;

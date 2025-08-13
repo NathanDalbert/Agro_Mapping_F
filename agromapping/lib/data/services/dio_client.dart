@@ -1,3 +1,4 @@
+// lib/data/services/dio_client.dart
 import 'package:dio/dio.dart';
 
 class DioClient {
@@ -9,10 +10,13 @@ class DioClient {
   DioClient._internal() {
     dio = Dio(
       BaseOptions(
-        baseUrl: "http://localhost:8090/api",
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 3),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        // CORREÇÃO: A baseUrl não deve conter o prefixo /api
+        baseUrl: "http://localhost:8090",
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
       ),
     );
   }

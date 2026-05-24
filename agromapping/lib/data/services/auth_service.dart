@@ -31,8 +31,11 @@ class AuthService {
       print('Status Code: ${e.response?.statusCode}');
       print('Resposta do Servidor: ${e.response?.data}');
       print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-      String errorMessage =
-          e.response?.data['message'] ?? 'Email ou senha inválidos.';
+      String errorMessage = 'Email ou senha inválidos.';
+      final data = e.response?.data;
+      if (data is Map && data['message'] != null) {
+        errorMessage = data['message'].toString();
+      }
       return {'success': false, 'message': errorMessage};
     }
   }

@@ -1,23 +1,19 @@
-// lib/utils/colors.dart
 import 'package:flutter/material.dart';
 
-// Cores principais da aplicação, baseadas na identidade visual.
-// Usar estas constantes em toda a aplicação garante consistência.
+const Color primaryColor = Color(0xFF2A9D8F);
+const Color secondaryColor = Color(0xFFE9C46A);
+const Color accentColor = Color(0xFFE76F51);
 
-const Color primaryColor = Color(
-  0xFF2A9D8F,
-); // Verde principal para botões e destaques
-const Color secondaryColor = Color(0xFFE9C46A); // Amarelo queimado para alertas
+const Color backgroundColor = Color(0xFFF8F9FA);
+const Color cardColor = Color(0xFFFFFFFF);
+const Color surfaceColor = Color(0xFFF1F3F5);
 
-const Color backgroundColor = Color(
-  0xFFF4F4F4,
-); // Fundo geral da aplicação (cinza claro)
-const Color cardColor = Color(
-  0xFFFFFFFF,
-); // Cor de fundo para cartões e superfícies
+const Color textColor = Color(0xFF1A1A2E);
+const Color subtitleColor = Color(0xFF6C757D);
+const Color textLightColor = Color(0xFFADB5BD);
 
-const Color textColor = Color(
-  0xFF264653,
-); // Cor principal para textos (cinza-azulado escuro)
-const Color subtitleColor =
-    Colors.grey; // Cor para subtítulos e textos menos importantes
+const Color successColor = Color(0xFF2ECC71);
+const Color dangerColor = Color(0xFFE74C3C);
+const Color warningColor = Color(0xFFF39C12);
+
+const Color dividerColor = Color(0xFFE9ECEF);

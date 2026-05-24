@@ -1,6 +1,10 @@
-// lib/main.dart
 import 'package:agromapping/ui/widgets/contatos_view_model.dart';
 import 'package:agromapping/ui/widgets/product_form_view_model.dart';
+import 'package:agromapping/view_models/busca_view_model.dart';
+import 'package:agromapping/view_models/editar_perfil_view_model.dart';
+import 'package:agromapping/view_models/estoque_view_model.dart';
+import 'package:agromapping/view_models/gerenciar_feiras_view_model.dart';
+import 'package:agromapping/view_models/pedidos_view_model.dart';
 import 'package:agromapping/view_models/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -37,6 +41,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductFormViewModel()),
         ChangeNotifierProvider(create: (_) => MyProductsViewModel()),
         ChangeNotifierProvider(create: (_) => ContatosViewModel()),
+        ChangeNotifierProvider(create: (_) => PedidosViewModel()),
+        ChangeNotifierProvider(create: (_) => BuscaViewModel()),
+        ChangeNotifierProvider(create: (_) => EditarPerfilViewModel()),
+        ChangeNotifierProvider(create: (_) => EstoqueViewModel()),
+        ChangeNotifierProvider(create: (_) => GerenciarFeirasViewModel()),
       ],
       child: MaterialApp(
         title: 'AgroMapping',

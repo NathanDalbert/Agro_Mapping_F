@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../data/models/contato.dart';
 import '../data/services/contato_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class ContatosViewModel extends ChangeNotifier {
   final ContatoService _contatoService = ContatoService();

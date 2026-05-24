@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/services/user_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class EditarPerfilViewModel extends ChangeNotifier {
   final UserService _userService = UserService();

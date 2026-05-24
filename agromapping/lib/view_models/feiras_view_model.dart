@@ -6,8 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../data/models/feira.dart';
 import '../data/services/feira_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class FeirasViewModel extends ChangeNotifier {
   final FeiraService _feiraService = FeiraService();

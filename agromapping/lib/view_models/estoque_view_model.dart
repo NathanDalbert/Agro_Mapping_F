@@ -4,8 +4,7 @@ import '../data/models/estoque.dart';
 import '../data/models/produto.dart';
 import '../data/services/estoque_service.dart';
 import '../data/services/produto_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class EstoqueViewModel extends ChangeNotifier {
   final EstoqueService _estoqueService = EstoqueService();

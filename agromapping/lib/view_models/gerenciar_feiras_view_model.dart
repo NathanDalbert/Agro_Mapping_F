@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/models/feira.dart';
 import '../data/services/feira_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class GerenciarFeirasViewModel extends ChangeNotifier {
   final FeiraService _feiraService = FeiraService();

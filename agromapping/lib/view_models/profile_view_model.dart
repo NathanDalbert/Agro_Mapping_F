@@ -1,11 +1,10 @@
 // lib/view_models/profile_view_model.dart
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../data/models/usuario.dart';
 import '../data/services/user_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   final UserService _userService = UserService();
@@ -35,7 +34,8 @@ class ProfileViewModel extends ChangeNotifier {
 
   // Função de Logout
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpa todos os dados guardados
+    final storage = const FlutterSecureStorage();
+    await storage.deleteAll();
+    notifyListeners();
   }
 }

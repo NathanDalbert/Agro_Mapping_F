@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../data/models/produto.dart';
 import '../data/services/produto_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class MyProductsViewModel extends ChangeNotifier {
   final ProdutoService _produtoService = ProdutoService();
@@ -29,5 +28,13 @@ class MyProductsViewModel extends ChangeNotifier {
       _state = ViewState.error;
     }
     notifyListeners();
+  }
+
+  Future<bool> deleteProduct(String productId) async {
+    try {
+      return await _produtoService.deleteProduct(productId);
+    } catch (e) {
+      return false;
+    }
   }
 }

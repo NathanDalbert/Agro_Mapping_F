@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/models/pedido.dart';
 import '../data/services/pedido_service.dart';
-
-enum ViewState { idle, loading, success, error }
+import '../utils/view_state.dart';
 
 class PedidosViewModel extends ChangeNotifier {
   final PedidoService _pedidoService = PedidoService();
@@ -38,8 +37,17 @@ class PedidosViewModel extends ChangeNotifier {
   Future<bool> cancelarPedido(String pedidoId) async {
     final success = await _pedidoService.cancelarPedido(pedidoId);
     if (success) {
-      _pedidos.removeWhere((p) => p.id == pedidoId);
-      notifyListeners();
+      final index = _pedidos.indexWhere((p) => p.id == pedidoId);
+      if (index != -1) {
+        _pedidos[index] = Pedido(
+          id: _pedidos[index].id,
+          dataPedido: _pedidos[index].dataPedido,
+          valorTotal: _pedidos[index].valorTotal,
+          itens: _pedidos[index].itens,
+          status: 'CANCELADO',
+        );
+        notifyListeners();
+      }
     }
     return success;
   }

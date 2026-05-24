@@ -1,7 +1,6 @@
-// lib/ui/screens/feiras_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart'; // Necessário para o ponto do mapa
+import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -20,37 +19,38 @@ class _FeirasScreenState extends State<FeirasScreen> {
   @override
   void initState() {
     super.initState();
-    // Garante que a verificação de permissão aconteça após a tela ser construída
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = Provider.of<FeirasViewModel>(context, listen: false);
-      // Se a permissão foi negada permanentemente, mostra um diálogo útil
       if (viewModel.permissionStatus == PermissionStatus.permanentlyDenied) {
         _showPermissionDialog();
       }
     });
   }
 
-  // Diálogo para guiar o utilizador às configurações do telemóvel
   void _showPermissionDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Permissão de Localização Necessária'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Permissao de Localizacao'),
         content: const Text(
-            'Para mostrar as feiras próximas, precisamos da sua permissão de localização. Por favor, ative a permissão nas configurações do seu dispositivo.'),
+            'Para mostrar as feiras proximas, precisamos da sua permissao de localizacao. Por favor, ative a permissao nas configuracoes do seu dispositivo.'),
         actions: [
           TextButton(
-            child:
-                const Text('Cancelar', style: TextStyle(color: subtitleColor)),
+            child: const Text('Cancelar', style: TextStyle(color: subtitleColor)),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          TextButton(
-            child: const Text('Abrir Configurações',
-                style: TextStyle(color: primaryColor)),
+          ElevatedButton(
             onPressed: () {
-              openAppSettings(); // Abre as configurações do app
+              openAppSettings();
               Navigator.of(context).pop();
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Abrir Configuracoes'),
           ),
         ],
       ),
@@ -59,26 +59,17 @@ class _FeirasScreenState extends State<FeirasScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ouve as mudanças no ViewModel para reconstruir a tela
     final viewModel = context.watch<FeirasViewModel>();
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      // Usamos CustomScrollView para combinar a AppBar, o mapa e a lista
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             backgroundColor: backgroundColor,
-            title: const Text('Feiras da Região',
-                style:
-                    TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-            actions: [
-              IconButton(
-                  icon: const Icon(Icons.send_outlined, color: textColor),
-                  onPressed: () {})
-            ],
-            floating:
-                true, // A AppBar aparece assim que se faz scroll para cima
+            title: const Text('Feiras da Regiao',
+                style: TextStyle(color: textColor, fontWeight: FontWeight.w800)),
+            floating: true,
           ),
           SliverToBoxAdapter(child: _buildMapSection(viewModel)),
           SliverToBoxAdapter(child: _buildHeader()),
@@ -88,29 +79,34 @@ class _FeirasScreenState extends State<FeirasScreen> {
     );
   }
 
-  // Secção que contém o mapa interativo
   Widget _buildMapSection(FeirasViewModel viewModel) {
     if (viewModel.state == ViewState.loading ||
         viewModel.userLocation == null) {
       return Container(
-        height: 250,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-            color: cardColor, borderRadius: BorderRadius.circular(16)),
-        child:
-            const Center(child: CircularProgressIndicator(color: primaryColor)),
+        height: 260,
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+        decoration: const BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        child: const Center(
+            child: CircularProgressIndicator(color: primaryColor)),
       );
     }
 
     return Container(
-      height: 250,
-      margin: const EdgeInsets.all(16),
+      height: 260,
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)
-          ]),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+          )
+        ],
+      ),
       child: FlutterMap(
         options: MapOptions(
           initialCenter: LatLng(
@@ -122,12 +118,10 @@ class _FeirasScreenState extends State<FeirasScreen> {
         children: [
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName:
-                'com.example.agromapping', // Substitua pelo seu package name
+            userAgentPackageName: 'com.example.agromapping',
           ),
           MarkerLayer(
             markers: [
-              // Marcador para a localização do utilizador
               Marker(
                 point: LatLng(
                   viewModel.userLocation!.latitude,
@@ -138,7 +132,6 @@ class _FeirasScreenState extends State<FeirasScreen> {
                 child: const Icon(Icons.my_location,
                     color: Colors.blueAccent, size: 30),
               ),
-              // Marcadores para cada feira
               ...viewModel.feiras.map((feira) => Marker(
                     point: feira.latLng,
                     width: 80,
@@ -153,42 +146,59 @@ class _FeirasScreenState extends State<FeirasScreen> {
     );
   }
 
-  // Cabeçalho da lista de feiras
   Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Text('Feiras Próximas',
-          style: TextStyle(
-              fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Feiras Proximas',
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.w800, color: textColor)),
+        ],
+      ),
     );
   }
 
-  // Lista de feiras
   Widget _buildFeirasList(FeirasViewModel viewModel) {
-    // Não mostra nada se estiver a carregar (o loading já está no mapa)
     if (viewModel.state == ViewState.loading) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
 
     if (viewModel.state == ViewState.error) {
-      return const SliverToBoxAdapter(
+      return SliverToBoxAdapter(
         child: Center(
           heightFactor: 5,
-          child: Text('Erro ao carregar as feiras.'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 56, color: dangerColor),
+              const SizedBox(height: 16),
+              const Text('Erro ao carregar as feiras.',
+                  style: TextStyle(color: subtitleColor)),
+            ],
+          ),
         ),
       );
     }
 
     if (viewModel.feiras.isEmpty) {
-      return const SliverToBoxAdapter(
+      return SliverToBoxAdapter(
         child: Center(
           heightFactor: 5,
-          child: Text('Nenhuma feira encontrada na sua região.'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.map_outlined, size: 64, color: textLightColor),
+              const SizedBox(height: 16),
+              const Text('Nenhuma feira encontrada na sua regiao.',
+                  style: TextStyle(fontSize: 14, color: subtitleColor)),
+            ],
+          ),
         ),
       );
     }
 
-    // Usa SliverList para integrar a lista dentro da CustomScrollView
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {

@@ -35,4 +35,14 @@ class Produto {
           : null,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'nome': nome,
+    'categoria': categoria,
+    'preco': preco,
+    'descricao': descricao,
+    'imagem': imagem,
+    'usuarioId': usuarioId,
+  };
 }

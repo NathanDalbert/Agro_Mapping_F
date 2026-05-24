@@ -15,10 +15,10 @@ class ItemPedido {
 
   factory ItemPedido.fromJson(Map<String, dynamic> json) {
     return ItemPedido(
-      id: json['itemPedido'] ?? '',
-      produto: Produto.fromJson(json['produto']),
-      quantidade: json['quantidade'],
-      valorTotalItem: (json['valorTotalItem'] as num).toDouble(),
+      id: json['itemPedido']?.toString() ?? '',
+      produto: Produto.fromJson(json['produto'] as Map<String, dynamic>),
+      quantidade: json['quantidade'] as int? ?? 0,
+      valorTotalItem: (json['valorTotalItem'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

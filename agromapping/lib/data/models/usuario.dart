@@ -24,4 +24,7 @@ class Usuario {
 
   // Helper para saber se o utilizador é um vendedor
   bool get isSeller => userRole == 'SELLER';
+
+  // Helper para saber se o utilizador é um administrador
+  bool get isAdmin => userRole == 'ADMIN';
 }

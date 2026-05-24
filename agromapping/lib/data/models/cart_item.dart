@@ -9,4 +9,9 @@ class CartItem {
 
   // Calcula o subtotal para este item
   double get subtotal => produto.preco * quantity;
+
+  Map<String, dynamic> toJson() => {
+    'produto': produto.toJson(),
+    'quantity': quantity,
+  };
 }

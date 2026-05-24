@@ -1,10 +1,8 @@
-// lib/view_models/home_view_model.dart
 import 'package:flutter/material.dart';
 
 import '../data/models/produto.dart';
 import '../data/services/produto_service.dart';
 
-// Enum para um controlo de estado mais limpo
 enum ViewState { idle, loading, success, error }
 
 class HomeViewModel extends ChangeNotifier {
@@ -14,20 +12,39 @@ class HomeViewModel extends ChangeNotifier {
   ViewState get state => _state;
 
   List<Produto> _produtos = [];
-  List<Produto> get produtos => _produtos;
+  List<Produto> get produtos => _filteredProdutos;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // O construtor é chamado uma vez, e inicia a busca de produtos.
+  String _selectedCategory = 'Todos';
+  String get selectedCategory => _selectedCategory;
+
+  List<Produto> get _filteredProdutos {
+    if (_selectedCategory == 'Todos') return _produtos;
+    return _produtos.where((p) => p.categoria == _selectedCategory).toList();
+  }
+
+  List<String> get categories {
+    final cats = <String>{'Todos'};
+    for (final p in _produtos) {
+      cats.add(p.categoria);
+    }
+    return cats.toList();
+  }
+
   HomeViewModel() {
     fetchProdutos();
   }
 
-  // Função que chama o serviço para buscar os dados na API
+  void setCategory(String category) {
+    _selectedCategory = category;
+    notifyListeners();
+  }
+
   Future<void> fetchProdutos() async {
     _state = ViewState.loading;
-    notifyListeners(); // Avisa a UI para mostrar o loading
+    notifyListeners();
 
     try {
       _produtos = await _produtoService.getProdutos();
@@ -37,7 +54,6 @@ class HomeViewModel extends ChangeNotifier {
       _state = ViewState.error;
     }
 
-    // Avisa a UI novamente, agora com os dados ou o erro.
     notifyListeners();
   }
 }

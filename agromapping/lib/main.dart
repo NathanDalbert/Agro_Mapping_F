@@ -1,4 +1,4 @@
-import 'package:agromapping/ui/widgets/contatos_view_model.dart';
+import 'package:agromapping/view_models/contatos_view_model.dart';
 import 'package:agromapping/ui/widgets/product_form_view_model.dart';
 import 'package:agromapping/view_models/busca_view_model.dart';
 import 'package:agromapping/view_models/editar_perfil_view_model.dart';
@@ -18,6 +18,8 @@ import 'view_models/home_view_model.dart';
 import 'view_models/login_view_model.dart';
 import 'view_models/my_products_view_model.dart';
 import 'view_models/register_view_model.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   initializeDateFormatting('pt_BR', null).then((_) {
@@ -48,6 +50,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GerenciarFeirasViewModel()),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'AgroMapping',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

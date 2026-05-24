@@ -1,4 +1,3 @@
-// lib/data/models/produto.dart
 import 'estoque.dart';
 
 class Produto {
@@ -8,8 +7,8 @@ class Produto {
   final double preco;
   final String descricao;
   final String imagem;
-  final String? usuarioId; // ID do usuário que criou o produto
-  final Estoque? estoque; // Estoque pode ser nulo
+  final String? usuarioId;
+  final Estoque? estoque;
 
   Produto({
     required this.id,
@@ -22,18 +21,18 @@ class Produto {
     this.estoque,
   });
 
-  // Converte um JSON em um objeto Produto
   factory Produto.fromJson(Map<String, dynamic> json) {
     return Produto(
-      id: json['id'],
-      nome: json['nome'],
-      categoria: json['categoria'],
-      preco: (json['preco'] as num).toDouble(),
-      descricao: json['descricao'],
-      imagem: json['imagem'],
-      usuarioId: json['usuarioId'],
-      estoque:
-          json['estoque'] != null ? Estoque.fromJson(json['estoque']) : null,
+      id: json['id']?.toString() ?? '',
+      nome: json['nome'] ?? '',
+      categoria: json['categoria'] ?? '',
+      preco: (json['preco'] as num?)?.toDouble() ?? 0.0,
+      descricao: json['descricao'] ?? '',
+      imagem: json['imagem'] ?? '',
+      usuarioId: json['usuarioId']?.toString(),
+      estoque: json['estoque'] != null
+          ? Estoque.fromJson(json['estoque'])
+          : null,
     );
   }
 }

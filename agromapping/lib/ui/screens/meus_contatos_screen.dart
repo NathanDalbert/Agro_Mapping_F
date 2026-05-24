@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/models/contato.dart';
 import '../../utils/colors.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/contatos_view_model.dart';
 
 class MeusContatosScreen extends StatelessWidget {

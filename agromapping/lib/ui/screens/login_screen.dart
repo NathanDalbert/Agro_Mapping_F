@@ -6,47 +6,60 @@ import '../../view_models/login_view_model.dart';
 import 'main_navigation_screen.dart';
 import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final loginViewModel = context.watch<LoginViewModel>();
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
-    void doLogin() async {
-      if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Preencha todos os campos.'),
-            backgroundColor: warningColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            margin: const EdgeInsets.all(12),
-          ),
-        );
-        return;
-      }
-      final result = await loginViewModel.login(
-          emailController.text, passwordController.text);
-      if (!context.mounted) return;
-      if (result['success']) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Ocorreu um erro.'),
-            backgroundColor: dangerColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            margin: const EdgeInsets.all(12),
-          ),
-        );
-      }
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _doLogin(LoginViewModel loginViewModel) async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Preencha todos os campos.'),
+          backgroundColor: warningColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      return;
     }
+    final result = await loginViewModel.login(
+        _emailController.text, _passwordController.text);
+    if (!context.mounted) return;
+    if (result['success']) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Ocorreu um erro.'),
+          backgroundColor: dangerColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loginViewModel = context.watch<LoginViewModel>();
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -60,9 +73,9 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 40),
                 _buildLogo(),
                 const SizedBox(height: 40),
-                _buildForm(emailController, passwordController, loginViewModel, doLogin),
+                _buildForm(loginViewModel),
                 const SizedBox(height: 20),
-                _buildRegisterLink(context),
+                _buildRegisterLink(),
                 const SizedBox(height: 40),
               ],
             ),
@@ -113,12 +126,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildForm(
-    TextEditingController emailController,
-    TextEditingController passwordController,
-    LoginViewModel loginViewModel,
-    VoidCallback doLogin,
-  ) {
+  Widget _buildForm(LoginViewModel loginViewModel) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -135,7 +143,7 @@ class LoginScreen extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
-            controller: emailController,
+            controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
               labelText: 'Email',
@@ -144,7 +152,7 @@ class LoginScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: passwordController,
+            controller: _passwordController,
             obscureText: !loginViewModel.isPasswordVisible,
             decoration: InputDecoration(
               labelText: 'Senha',
@@ -161,7 +169,7 @@ class LoginScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: loginViewModel.isLoading ? null : doLogin,
+              onPressed: loginViewModel.isLoading ? null : () => _doLogin(loginViewModel),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
@@ -184,7 +192,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRegisterLink(BuildContext context) {
+  Widget _buildRegisterLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

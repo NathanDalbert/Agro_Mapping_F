@@ -4,8 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/image_helper.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/busca_view_model.dart';
-import '../../view_models/home_view_model.dart' hide ViewState;
+import '../../view_models/home_view_model.dart';
 import 'product_detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -322,7 +323,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tente buscar por "$query" com outras palavras',
+            'Tente buscar por "$_query" com outras palavras',
             style: const TextStyle(fontSize: 14, color: subtitleColor),
           ),
         ],
@@ -337,7 +338,7 @@ class _SearchScreenState extends State<SearchScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Text(
-            '${resultados.length} resultado${resultados.length == 1 ? '' : 's'} para "$query"',
+            '${resultados.length} resultado${resultados.length == 1 ? '' : 's'} para "$_query"',
             style: const TextStyle(
               fontSize: 13,
               color: subtitleColor,

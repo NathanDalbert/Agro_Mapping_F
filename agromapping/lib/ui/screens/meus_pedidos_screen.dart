@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/pedidos_view_model.dart';
 import 'detalhe_pedido_screen.dart';
 
@@ -124,6 +125,18 @@ class _PedidoCard extends StatelessWidget {
     required this.onCancel,
   });
 
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'PENDENTE': return Colors.grey;
+      case 'CONFIRMADO': return Colors.blue;
+      case 'PREPARANDO': return Colors.orange;
+      case 'ENVIADO': return Colors.teal;
+      case 'ENTREGUE': return Colors.green;
+      case 'CANCELADO': return Colors.red;
+      default: return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -150,11 +163,18 @@ class _PedidoCard extends StatelessWidget {
                       color: textColor,
                     ),
                   ),
-                  Chip(
-                    label: Text('${pedido.itens.length} itens'),
-                    backgroundColor: primaryColor.withOpacity(0.1),
-                    side: BorderSide.none,
-                  ),
+                  if (pedido.status != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(pedido.status!).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        pedido.status!,
+                        style: TextStyle(color: _getStatusColor(pedido.status!), fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -181,12 +201,13 @@ class _PedidoCard extends StatelessWidget {
                       color: primaryColor,
                     ),
                   ),
-                  TextButton.icon(
-                    onPressed: onCancel,
-                    icon: const Icon(Icons.cancel_outlined, size: 18),
-                    label: const Text('Cancelar'),
-                    style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  ),
+                  if (pedido.status == null || (pedido.status != 'CANCELADO' && pedido.status != 'ENTREGUE'))
+                    TextButton.icon(
+                      onPressed: onCancel,
+                      icon: const Icon(Icons.cancel_outlined, size: 18),
+                      label: const Text('Cancelar'),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                    ),
                 ],
               ),
             ],

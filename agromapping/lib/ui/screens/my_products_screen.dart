@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../data/services/produto_service.dart';
 import '../../utils/colors.dart';
+import '../../utils/view_state.dart';
 import '../../utils/image_helper.dart';
 import '../../view_models/my_products_view_model.dart';
 import 'add_product_screen.dart';
@@ -187,8 +187,7 @@ class MyProductsScreen extends StatelessWidget {
                         ),
                       );
                       if (confirm == true) {
-                        final service = ProdutoService();
-                        final success = await service.deleteProduct(product.id);
+                        final success = await viewModel.deleteProduct(product.id);
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

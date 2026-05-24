@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/feiras_view_model.dart';
 import '../widgets/feira_card.dart';
 

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/image_helper.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/estoque_view_model.dart';
 
 class GerenciarEstoqueScreen extends StatelessWidget {

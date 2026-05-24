@@ -9,6 +9,18 @@ class DetalhePedidoScreen extends StatelessWidget {
 
   const DetalhePedidoScreen({super.key, required this.pedido});
 
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'PENDENTE': return Colors.grey;
+      case 'CONFIRMADO': return Colors.blue;
+      case 'PREPARANDO': return Colors.orange;
+      case 'ENVIADO': return Colors.teal;
+      case 'ENTREGUE': return Colors.green;
+      case 'CANCELADO': return Colors.red;
+      default: return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +81,19 @@ class DetalhePedidoScreen extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            if (pedido.status != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(pedido.status!).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  pedido.status!,
+                  style: TextStyle(color: _getStatusColor(pedido.status!), fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
             const SizedBox(height: 12),
             Row(
               children: [

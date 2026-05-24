@@ -1,13 +1,17 @@
 import 'package:agromapping/data/models/usuario.dart' show Usuario;
+import 'package:agromapping/data/services/contato_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/profile_view_model.dart';
 import '../widgets/profile_menu_item.dart';
 import 'edit_profile_screen.dart';
 import 'gerenciar_estoque_screen.dart';
+import 'gerenciar_feiras_screen.dart';
 import 'login_screen.dart';
+import 'meus_contatos_screen.dart';
 import 'meus_pedidos_screen.dart';
 import 'my_products_screen.dart';
 import 'add_product_screen.dart';
@@ -62,7 +66,36 @@ class ProfileScreen extends StatelessWidget {
               _buildProfileHeader(user),
               const SizedBox(height: 20),
               _buildMenuSection(context, user),
+              if (!user.isSeller && !user.isAdmin)
+                _buildBecomeSellerBanner(context, viewModel),
               if (user.isSeller) _buildSellerSection(context),
+              if (user.isAdmin) ...[
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(4, 0, 0, 8),
+                        child: Text('Administração',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                      ProfileMenuItem(
+                        title: 'Gerenciar Feiras',
+                        icon: Icons.store_mall_directory_outlined,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const GerenciarFeirasScreen()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               _buildAccountSection(context, viewModel),
               const SizedBox(height: 40),
             ],
@@ -199,6 +232,148 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildBecomeSellerBanner(BuildContext context, ProfileViewModel viewModel) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [primaryColor.withValues(alpha: 0.1), primaryColor.withValues(alpha: 0.05)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.storefront_outlined, color: primaryColor, size: 28),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Quer vender seus produtos?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Cadastre seu telefone e comece a vender no Agro Mapping.',
+                        style: TextStyle(fontSize: 13, color: subtitleColor),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _showBecomeSellerDialog(context, viewModel),
+                icon: const Icon(Icons.arrow_forward, size: 18),
+                label: const Text('Tornar-se Vendedor'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBecomeSellerDialog(BuildContext context, ProfileViewModel viewModel) {
+    final phoneController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Tornar-se Vendedor'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Cadastre seu telefone de contato para ativar sua conta de vendedor.',
+              style: TextStyle(color: subtitleColor, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: phoneController,
+              decoration: const InputDecoration(
+                labelText: 'Telefone de Contato',
+                prefixIcon: Icon(Icons.phone_outlined),
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.phone,
+              autofocus: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final phone = phoneController.text.trim();
+              if (phone.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Informe um telefone.'),
+                    backgroundColor: dangerColor,
+                  ),
+                );
+                return;
+              }
+              Navigator.pop(ctx);
+              try {
+                await ContatoService().createContato(phone);
+                await viewModel.fetchUserProfile();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Agora voce e um vendedor!'),
+                      backgroundColor: successColor,
+                    ),
+                  );
+                }
+              } catch (_) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Erro ao ativar conta de vendedor.'),
+                      backgroundColor: dangerColor,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Ativar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSellerSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -240,6 +415,15 @@ class ProfileScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => const GerenciarEstoqueScreen(),
                 ),
+              );
+            },
+          ),
+          ProfileMenuItem(
+            title: 'Meus Contatos',
+            icon: Icons.phone_outlined,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const MeusContatosScreen()),
               );
             },
           ),

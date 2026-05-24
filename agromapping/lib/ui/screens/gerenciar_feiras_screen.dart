@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/view_state.dart';
 import '../../view_models/gerenciar_feiras_view_model.dart';
 
 class GerenciarFeirasScreen extends StatelessWidget {

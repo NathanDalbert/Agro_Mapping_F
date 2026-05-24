@@ -1,5 +1,27 @@
-// lib/data/services/dio_client.dart
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+class AuthInterceptor extends Interceptor {
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final token = await _secureStorage.read(key: 'token');
+    if (token != null) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+    handler.next(options);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.response?.statusCode == 401) {
+      _secureStorage.deleteAll();
+      // Navigation will be handled by the app checking auth state
+    }
+    handler.next(err);
+  }
+}
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();
@@ -10,8 +32,7 @@ class DioClient {
   DioClient._internal() {
     dio = Dio(
       BaseOptions(
-        // CORREÇÃO: A baseUrl não deve conter o prefixo /api
-        baseUrl: "http://localhost:8090",
+        baseUrl: const String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8090'),
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {
@@ -19,5 +40,6 @@ class DioClient {
         },
       ),
     );
+    dio.interceptors.add(AuthInterceptor());
   }
 }

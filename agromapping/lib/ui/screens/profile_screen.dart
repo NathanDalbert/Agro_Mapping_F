@@ -13,6 +13,7 @@ import 'gerenciar_feiras_screen.dart';
 import 'login_screen.dart';
 import 'meus_contatos_screen.dart';
 import 'meus_pedidos_screen.dart';
+import 'minhas_reservas_screen.dart';
 import 'my_products_screen.dart';
 import 'add_product_screen.dart';
 
@@ -224,6 +225,15 @@ class ProfileScreen extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const MeusPedidosScreen()),
+              );
+            },
+          ),
+          ProfileMenuItem(
+            title: 'Minhas Reservas',
+            icon: Icons.bookmark_outlined,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const MinhasReservasScreen()),
               );
             },
           ),

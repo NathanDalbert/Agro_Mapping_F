@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/produto.dart';
+import '../../data/services/reserva_service.dart';
 import '../../utils/colors.dart';
 import '../../utils/image_helper.dart';
 import '../../view_models/cart_view_model.dart';
+import 'reserva_confirmacao_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Produto produto;
@@ -196,48 +198,72 @@ class ProductDetailScreen extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                const Text('Preco',
-                    style: TextStyle(color: subtitleColor, fontSize: 12)),
-                Text(
-                  'R\$ ${produto.preco.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: primaryColor,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Preco',
+                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                    Text(
+                      'R\$ ${produto.preco.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<CartViewModel>().addItem(produto);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${produto.nome} adicionado ao carrinho!'),
+                          backgroundColor: primaryColor,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          margin: const EdgeInsets.all(12),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.shopping_bag_outlined, size: 20),
+                    label: const Text('Adicionar',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 0,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.read<CartViewModel>().addItem(produto);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${produto.nome} adicionado ao carrinho!'),
-                      backgroundColor: primaryColor,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      margin: const EdgeInsets.all(12),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.shopping_bag_outlined, size: 20),
-                label: const Text('Adicionar',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 0,
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _reservar(context),
+                icon: const Icon(Icons.bookmark_add_outlined, color: primaryColor),
+                label: const Text('Reservar na Feira',
+                    style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: primaryColor),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
                 ),
               ),
             ),
@@ -245,5 +271,26 @@ class ProductDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _reservar(BuildContext context) async {
+    try {
+      final reserva = await ReservaService()
+          .criarReserva(idProduto: produto.id, quantidade: 1);
+      if (context.mounted) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => ReservaConfirmacaoScreen(reserva: reserva),
+        ));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao reservar: $e'),
+            backgroundColor: dangerColor,
+          ),
+        );
+      }
+    }
   }
 }

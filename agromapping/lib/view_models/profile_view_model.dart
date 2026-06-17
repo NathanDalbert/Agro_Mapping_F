@@ -26,15 +26,28 @@ class ProfileViewModel extends ChangeNotifier {
     try {
       _user = await _userService.getUserProfile();
       _state = ViewState.success;
-    } catch (e) {
-      _state = ViewState.error;
+    } catch (_) {
+      // Fallback: se a API falhar mas o usuário tem sessão local, mostra menus
+      const storage = FlutterSecureStorage();
+      final usuarioId = await storage.read(key: 'usuarioId');
+      if (usuarioId != null) {
+        _user = Usuario(
+          id: usuarioId,
+          nome: 'Utilizador',
+          email: '',
+          userRole: 'USER',
+        );
+        _state = ViewState.success;
+      } else {
+        _state = ViewState.error;
+      }
     }
     notifyListeners();
   }
 
   // Função de Logout
   Future<void> logout() async {
-    final storage = const FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     await storage.deleteAll();
     notifyListeners();
   }

@@ -32,7 +32,7 @@ class DioClient {
   DioClient._internal() {
     dio = Dio(
       BaseOptions(
-        baseUrl: const String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8090'),
+        baseUrl: const String.fromEnvironment('API_URL', defaultValue: 'https://agro-mapping.onrender.com'),
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {

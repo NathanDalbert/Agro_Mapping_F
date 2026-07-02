@@ -27,52 +27,71 @@ void main() {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<MyAppState>()!;
+
+  @override
+  State<MyApp> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  Key _key = UniqueKey();
+
+  void restart() {
+    setState(() {
+      _key = UniqueKey();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => LoginViewModel()),
-        ChangeNotifierProvider(create: (_) => RegisterViewModel()),
-        ChangeNotifierProvider(create: (_) => HomeViewModel()),
-        ChangeNotifierProvider(create: (_) => FeirasViewModel()),
-        ChangeNotifierProvider(create: (_) => CartViewModel()),
-        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
-        ChangeNotifierProvider(create: (_) => ProductFormViewModel()),
-        ChangeNotifierProvider(create: (_) => MyProductsViewModel()),
-        ChangeNotifierProvider(create: (_) => ContatosViewModel()),
-        ChangeNotifierProvider(create: (_) => PedidosViewModel()),
-        ChangeNotifierProvider(create: (_) => BuscaViewModel()),
-        ChangeNotifierProvider(create: (_) => EditarPerfilViewModel()),
-        ChangeNotifierProvider(create: (_) => EstoqueViewModel()),
-        ChangeNotifierProvider(create: (_) => GerenciarFeirasViewModel()),
-      ],
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        title: 'AgroMapping',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          fontFamily: 'Poppins',
-          scaffoldBackgroundColor: backgroundColor,
-          primaryColor: primaryColor,
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: cardColor,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+    return KeyedSubtree(
+      key: _key,
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => LoginViewModel()),
+          ChangeNotifierProvider(create: (_) => RegisterViewModel()),
+          ChangeNotifierProvider(create: (_) => HomeViewModel()),
+          ChangeNotifierProvider(create: (_) => FeirasViewModel()),
+          ChangeNotifierProvider(create: (_) => CartViewModel()),
+          ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+          ChangeNotifierProvider(create: (_) => ProductFormViewModel()),
+          ChangeNotifierProvider(create: (_) => MyProductsViewModel()),
+          ChangeNotifierProvider(create: (_) => ContatosViewModel()),
+          ChangeNotifierProvider(create: (_) => PedidosViewModel()),
+          ChangeNotifierProvider(create: (_) => BuscaViewModel()),
+          ChangeNotifierProvider(create: (_) => EditarPerfilViewModel()),
+          ChangeNotifierProvider(create: (_) => EstoqueViewModel()),
+          ChangeNotifierProvider(create: (_) => GerenciarFeirasViewModel()),
+        ],
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          title: 'AgroMapping',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            fontFamily: 'Poppins',
+            scaffoldBackgroundColor: backgroundColor,
+            primaryColor: primaryColor,
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: cardColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              labelStyle: const TextStyle(color: subtitleColor),
             ),
-            labelStyle: const TextStyle(color: subtitleColor),
+            appBarTheme: const AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              foregroundColor: textColor,
+            ),
           ),
-          appBarTheme: const AppBarTheme(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            foregroundColor: textColor,
-          ),
+          home: const LoginScreen(),
         ),
-        home: const LoginScreen(),
       ),
     );
   }

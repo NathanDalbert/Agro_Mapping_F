@@ -1,5 +1,6 @@
 import 'package:agromapping/data/models/usuario.dart' show Usuario;
 import 'package:agromapping/data/services/contato_service.dart';
+import 'package:agromapping/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +11,6 @@ import '../widgets/profile_menu_item.dart';
 import 'edit_profile_screen.dart';
 import 'gerenciar_estoque_screen.dart';
 import 'gerenciar_feiras_screen.dart';
-import 'login_screen.dart';
 import 'meus_contatos_screen.dart';
 import 'meus_pedidos_screen.dart';
 import 'minhas_reservas_screen.dart';
@@ -463,10 +463,7 @@ class ProfileScreen extends StatelessWidget {
             onTap: () async {
               await viewModel.logout();
               if (context.mounted) {
-                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (route) => false,
-                );
+                MyApp.of(context).restart();
               }
             },
           ),
